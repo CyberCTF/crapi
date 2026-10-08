@@ -21,7 +21,7 @@ upstream source with its own Dockerfile and the environment of upstream's compos
 
 ```bash
 isoloom generate
-isoloom up docker
+isoloom run docker
 ```
 
 Then open http://localhost:8888/ and sign up with an `@example.com` address; mails (OTPs, vehicle
