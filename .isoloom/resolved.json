@@ -1,0 +1,1154 @@
+{
+  "generated_by_isoloom": "from isoloom.yml; don't edit: change the spec and run `isoloom generate` (`isoloom check` fails when this file is out of date)",
+  "resolved_version": 1,
+  "name": "crapi",
+  "instance": null,
+  "inputs": [],
+  "networks": {
+    "lab": {
+      "cidr": "10.60.6.0/24",
+      "docker_cidr": "10.60.6.0/24",
+      "internet": false,
+      "gateway": null,
+      "gateway_address": "10.60.6.1",
+      "router": null,
+      "controller": "10.60.6.253"
+    }
+  },
+  "reach": [],
+  "machines": {
+    "postgresdb": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.6.20"
+      },
+      "docker_addresses": {
+        "lab": "10.60.6.20"
+      },
+      "services": [
+        {
+          "port": 5432,
+          "name": "postgres",
+          "http": false,
+          "publish": null
+        }
+      ],
+      "depends_on": [],
+      "inputs": [],
+      "volumes": {
+        "data": "/var/lib/postgresql/data"
+      },
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 256,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    },
+    "mongodb": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.6.21"
+      },
+      "docker_addresses": {
+        "lab": "10.60.6.21"
+      },
+      "services": [
+        {
+          "port": 27017,
+          "name": "mongodb",
+          "http": false,
+          "publish": null
+        }
+      ],
+      "depends_on": [],
+      "inputs": [],
+      "volumes": {
+        "data": "/data/db"
+      },
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 256,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    },
+    "mailhog": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.6.22"
+      },
+      "docker_addresses": {
+        "lab": "10.60.6.22"
+      },
+      "services": [
+        {
+          "port": 1025,
+          "name": "smtp",
+          "http": false,
+          "publish": null
+        },
+        {
+          "port": 8025,
+          "name": "mail-ui",
+          "http": true,
+          "publish": 8025
+        }
+      ],
+      "depends_on": [
+        "mongodb"
+      ],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 256,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    },
+    "gateway-service": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.6.23"
+      },
+      "docker_addresses": {
+        "lab": "10.60.6.23"
+      },
+      "services": [
+        {
+          "port": 443,
+          "name": "https",
+          "http": false,
+          "publish": null
+        }
+      ],
+      "depends_on": [],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 256,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    },
+    "crapi-identity": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.6.11"
+      },
+      "docker_addresses": {
+        "lab": "10.60.6.11"
+      },
+      "services": [
+        {
+          "port": 8080,
+          "name": "identity",
+          "http": true,
+          "publish": null
+        }
+      ],
+      "depends_on": [
+        "postgresdb",
+        "mongodb",
+        "mailhog"
+      ],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 384,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    },
+    "crapi-community": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.6.12"
+      },
+      "docker_addresses": {
+        "lab": "10.60.6.12"
+      },
+      "services": [
+        {
+          "port": 8087,
+          "name": "community",
+          "http": true,
+          "publish": null
+        }
+      ],
+      "depends_on": [
+        "postgresdb",
+        "mongodb",
+        "crapi-identity"
+      ],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 256,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    },
+    "crapi-workshop": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.6.13"
+      },
+      "docker_addresses": {
+        "lab": "10.60.6.13"
+      },
+      "services": [
+        {
+          "port": 8000,
+          "name": "workshop",
+          "http": true,
+          "publish": null
+        }
+      ],
+      "depends_on": [
+        "postgresdb",
+        "mongodb",
+        "crapi-identity",
+        "crapi-community"
+      ],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 256,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    },
+    "crapi-web": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.6.10"
+      },
+      "docker_addresses": {
+        "lab": "10.60.6.10"
+      },
+      "services": [
+        {
+          "port": 80,
+          "name": "web",
+          "http": true,
+          "publish": 8888
+        },
+        {
+          "port": 443,
+          "name": "https",
+          "http": false,
+          "publish": 8443
+        }
+      ],
+      "depends_on": [
+        "crapi-identity",
+        "crapi-community",
+        "crapi-workshop",
+        "mailhog"
+      ],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 256,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    }
+  },
+  "start_order": [
+    "postgresdb",
+    "mongodb",
+    "mailhog",
+    "gateway-service",
+    "crapi-identity",
+    "crapi-community",
+    "crapi-workshop",
+    "crapi-web"
+  ],
+  "clones": {},
+  "tools": {},
+  "groups": {},
+  "router": null,
+  "controller": {
+    "addresses": {
+      "lab": "10.60.6.253"
+    }
+  },
+  "published": [
+    {
+      "machine": "mailhog",
+      "port": 8025,
+      "host_port": 8025
+    },
+    {
+      "machine": "crapi-web",
+      "port": 80,
+      "host_port": 8888
+    },
+    {
+      "machine": "crapi-web",
+      "port": 443,
+      "host_port": 8443
+    }
+  ],
+  "targets": {
+    "possible": [
+      "docker",
+      "hosted",
+      "docker-vm",
+      "cloud-docker",
+      "kubernetes"
+    ],
+    "generated": [
+      "docker",
+      "hosted",
+      "docker-vm",
+      "cloud-docker",
+      "kubernetes"
+    ],
+    "refused": {},
+    "not_possible": {
+      "hybrid": "only when some machines are containers and others are VMs",
+      "vagrant": "needs `vm:` on postgresdb, mongodb, mailhog, gateway-service, crapi-identity, crapi-community, crapi-workshop, crapi-web",
+      "proxmox": "needs `vm:` on postgresdb, mongodb, mailhog, gateway-service, crapi-identity, crapi-community, crapi-workshop, crapi-web",
+      "cloud-vm": "needs `vm:` on postgresdb, mongodb, mailhog, gateway-service, crapi-identity, crapi-community, crapi-workshop, crapi-web",
+      "external": "needs `external:` on postgresdb, mongodb, mailhog, gateway-service, crapi-identity, crapi-community, crapi-workshop, crapi-web"
+    }
+  },
+  "checks": {
+    "default_position": "networks",
+    "positions": [
+      {
+        "position": "networks",
+        "machine": null,
+        "runner": "isoloom-check",
+        "checks": [
+          {
+            "name": "crAPI answers",
+            "derived": false,
+            "kind": "http",
+            "target": "http://crapi-web/",
+            "expect": "200",
+            "wait": 300
+          },
+          {
+            "name": "the identity service is healthy",
+            "derived": false,
+            "kind": "http",
+            "target": "http://crapi-identity:8080/identity/health_check",
+            "expect": "200",
+            "wait": 120
+          },
+          {
+            "name": "the community service answers",
+            "derived": false,
+            "kind": "http",
+            "target": "http://crapi-community:8087/community/home",
+            "expect": "200",
+            "wait": 120
+          },
+          {
+            "name": "the workshop service is healthy",
+            "derived": false,
+            "kind": "http",
+            "target": "http://crapi-workshop:8000/workshop/health_check/",
+            "expect": "200",
+            "wait": 180
+          },
+          {
+            "name": "a seeded user logs in and reads its dashboard",
+            "derived": false,
+            "kind": "script",
+            "target": "checks/login.sh",
+            "expect": "",
+            "wait": 120
+          },
+          {
+            "name": "MailHog answers",
+            "derived": false,
+            "kind": "http",
+            "target": "http://mailhog:8025/",
+            "expect": "200",
+            "wait": 30
+          },
+          {
+            "name": "the payment gateway answers",
+            "derived": false,
+            "kind": "tcp",
+            "target": "gateway-service:443",
+            "expect": "open",
+            "wait": 30
+          }
+        ]
+      },
+      {
+        "position": "postgresdb",
+        "machine": "postgresdb",
+        "runner": "isoloom-check-postgresdb",
+        "checks": [
+          {
+            "name": "mongodb:27017 from postgresdb",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.21:27017",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:1025 from postgresdb",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.22:1025",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:8025 from postgresdb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.22:8025/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "gateway-service:443 from postgresdb",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.23:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "crapi-identity:8080 from postgresdb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.11:8080/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-community:8087 from postgresdb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.12:8087/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-workshop:8000 from postgresdb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.13:8000/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:80 from postgresdb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.10:80/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:443 from postgresdb",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.10:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "no internet from postgresdb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "mongodb",
+        "machine": "mongodb",
+        "runner": "isoloom-check-mongodb",
+        "checks": [
+          {
+            "name": "postgresdb:5432 from mongodb",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.20:5432",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:1025 from mongodb",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.22:1025",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:8025 from mongodb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.22:8025/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "gateway-service:443 from mongodb",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.23:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "crapi-identity:8080 from mongodb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.11:8080/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-community:8087 from mongodb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.12:8087/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-workshop:8000 from mongodb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.13:8000/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:80 from mongodb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.10:80/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:443 from mongodb",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.10:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "no internet from mongodb",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "mailhog",
+        "machine": "mailhog",
+        "runner": "isoloom-check-mailhog",
+        "checks": [
+          {
+            "name": "postgresdb:5432 from mailhog",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.20:5432",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mongodb:27017 from mailhog",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.21:27017",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "gateway-service:443 from mailhog",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.23:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "crapi-identity:8080 from mailhog",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.11:8080/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-community:8087 from mailhog",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.12:8087/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-workshop:8000 from mailhog",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.13:8000/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:80 from mailhog",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.10:80/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:443 from mailhog",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.10:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "no internet from mailhog",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "gateway-service",
+        "machine": "gateway-service",
+        "runner": "isoloom-check-gateway-service",
+        "checks": [
+          {
+            "name": "postgresdb:5432 from gateway-service",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.20:5432",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mongodb:27017 from gateway-service",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.21:27017",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:1025 from gateway-service",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.22:1025",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:8025 from gateway-service",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.22:8025/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-identity:8080 from gateway-service",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.11:8080/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-community:8087 from gateway-service",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.12:8087/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-workshop:8000 from gateway-service",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.13:8000/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:80 from gateway-service",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.10:80/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:443 from gateway-service",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.10:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "no internet from gateway-service",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "crapi-identity",
+        "machine": "crapi-identity",
+        "runner": "isoloom-check-crapi-identity",
+        "checks": [
+          {
+            "name": "postgresdb:5432 from crapi-identity",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.20:5432",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mongodb:27017 from crapi-identity",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.21:27017",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:1025 from crapi-identity",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.22:1025",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:8025 from crapi-identity",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.22:8025/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "gateway-service:443 from crapi-identity",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.23:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "crapi-community:8087 from crapi-identity",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.12:8087/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-workshop:8000 from crapi-identity",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.13:8000/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:80 from crapi-identity",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.10:80/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:443 from crapi-identity",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.10:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "no internet from crapi-identity",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "crapi-community",
+        "machine": "crapi-community",
+        "runner": "isoloom-check-crapi-community",
+        "checks": [
+          {
+            "name": "postgresdb:5432 from crapi-community",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.20:5432",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mongodb:27017 from crapi-community",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.21:27017",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:1025 from crapi-community",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.22:1025",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:8025 from crapi-community",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.22:8025/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "gateway-service:443 from crapi-community",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.23:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "crapi-identity:8080 from crapi-community",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.11:8080/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-workshop:8000 from crapi-community",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.13:8000/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:80 from crapi-community",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.10:80/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:443 from crapi-community",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.10:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "no internet from crapi-community",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "crapi-workshop",
+        "machine": "crapi-workshop",
+        "runner": "isoloom-check-crapi-workshop",
+        "checks": [
+          {
+            "name": "postgresdb:5432 from crapi-workshop",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.20:5432",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mongodb:27017 from crapi-workshop",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.21:27017",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:1025 from crapi-workshop",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.22:1025",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:8025 from crapi-workshop",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.22:8025/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "gateway-service:443 from crapi-workshop",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.23:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "crapi-identity:8080 from crapi-workshop",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.11:8080/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-community:8087 from crapi-workshop",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.12:8087/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:80 from crapi-workshop",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.10:80/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-web:443 from crapi-workshop",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.10:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "no internet from crapi-workshop",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "crapi-web",
+        "machine": "crapi-web",
+        "runner": "isoloom-check-crapi-web",
+        "checks": [
+          {
+            "name": "postgresdb:5432 from crapi-web",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.20:5432",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mongodb:27017 from crapi-web",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.21:27017",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:1025 from crapi-web",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.22:1025",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "mailhog:8025 from crapi-web",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.22:8025/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "gateway-service:443 from crapi-web",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.6.23:443",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "crapi-identity:8080 from crapi-web",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.11:8080/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-community:8087 from crapi-web",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.12:8087/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "crapi-workshop:8000 from crapi-web",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.6.13:8000/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "no internet from crapi-web",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      }
+    ]
+  },
+  "message": "crAPI answers at http://localhost:8888/ (HTTPS on\n8443). Sign up with an @example.com address; the mails\n(OTPs, vehicle details) arrive in MailHog at http://localhost:8025/.\nThe challenges are listed in app/docs/challenges.md.\n"
+}

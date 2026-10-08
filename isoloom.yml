@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=https://www.isoloom.com/schema/v1.json
+# OWASP crAPI, completely ridiculous API (by the OWASP crAPI contributors) as an Isoloom spec:
+# every service builds from the upstream source (OWASP/crAPI, vendored unchanged: the services in
+# build/<machine>/app/, the rest in app/) with the environment of upstream's docker-compose.yml
+# baked in. The LLM chatbot is left out (it needs an OpenAI key and internet access).
+# `isoloom generate`, then `isoloom up docker`.
+version: 1
+name: crapi
+
+networks:
+  lab: { cidr: 10.60.6.0/24, internet: false }
+
+machines:
+  postgresdb:
+    networks: { lab: 20 }
+    services: [{ port: 5432, name: postgres }]
+    resources: { cpus: 1, memory_mb: 256 }
+    volumes: { data: /var/lib/postgresql/data }
+    docker:
+      build: build/postgresdb
+
+  mongodb:
+    networks: { lab: 21 }
+    services: [{ port: 27017, name: mongodb }]
+    resources: { cpus: 1, memory_mb: 256 }
+    volumes: { data: /data/db }
+    docker:
+      build: build/mongodb
+
+  mailhog:
+    networks: { lab: 22 }
+    services:
+      - { port: 1025, name: smtp }
+      - { port: 8025, name: mail-ui, http: true, publish: 8025 }
+    resources: { cpus: 1, memory_mb: 256 }
+    depends_on: [mongodb]
+    docker:
+      build: build/mailhog
+
+  gateway-service:
+    networks: { lab: 23 }
+    services: [{ port: 443, name: https }]
+    resources: { cpus: 1, memory_mb: 256 }
+    docker:
+      build: build/gateway-service
+
+  crapi-identity:
+    networks: { lab: 11 }
+    services: [{ port: 8080, name: identity, http: true }]
+    resources: { cpus: 1, memory_mb: 384 }
+    depends_on: [postgresdb, mongodb, mailhog]
+    docker:
+      build: build/crapi-identity
+
+  crapi-community:
+    networks: { lab: 12 }
+    services: [{ port: 8087, name: community, http: true }]
+    resources: { cpus: 1, memory_mb: 256 }
+    depends_on: [postgresdb, mongodb, crapi-identity]
+    docker:
+      build: build/crapi-community
+
+  crapi-workshop:
+    networks: { lab: 13 }
+    services: [{ port: 8000, name: workshop, http: true }]
+    resources: { cpus: 1, memory_mb: 256 }
+    depends_on: [postgresdb, mongodb, crapi-identity, crapi-community]
+    docker:
+      build: build/crapi-workshop
+
+  crapi-web:
+    networks: { lab: 10 }
+    services:
+      - { port: 80, name: web, http: true, publish: 8888 }
+      - { port: 443, name: https, publish: 8443 }
+    resources: { cpus: 1, memory_mb: 256 }
+    depends_on: [crapi-identity, crapi-community, crapi-workshop, mailhog]
+    docker:
+      build: build/crapi-web
+
+checks:
+  - name: crAPI answers
+    http: http://crapi-web/
+    wait: 300
+  - name: the identity service is healthy
+    http: http://crapi-identity:8080/identity/health_check
+    wait: 120
+  - name: the community service answers
+    http: http://crapi-community:8087/community/home
+    wait: 120
+  - name: the workshop service is healthy
+    http: http://crapi-workshop:8000/workshop/health_check/
+    wait: 180
+  - name: a seeded user logs in and reads its dashboard
+    script: checks/login.sh
+    wait: 120
+  - name: MailHog answers
+    http: http://mailhog:8025/
+  - name: the payment gateway answers
+    tcp: gateway-service:443
+
+message: |
+  crAPI answers at http://localhost:{{ machines.crapi-web.services.0.publish }}/ (HTTPS on
+  {{ machines.crapi-web.services.1.publish }}). Sign up with an @example.com address; the mails
+  (OTPs, vehicle details) arrive in MailHog at http://localhost:{{ machines.mailhog.services.1.publish }}/.
+  The challenges are listed in app/docs/challenges.md.
