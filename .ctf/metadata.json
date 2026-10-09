@@ -4,6 +4,5 @@
   "question": "Solve the crAPI challenges (app/docs/challenges.md).",
   "category": "WEB",
   "difficulty": 3,
-  "evidence_kind": "SECRET",
-  "capabilities": ["broken-object-level-authorization", "broken-authentication", "excessive-data-exposure", "mass-assignment", "ssrf", "nosql-injection"]
+  "evidence_kind": "SECRET"
 }
