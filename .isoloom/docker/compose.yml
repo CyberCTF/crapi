@@ -9,6 +9,9 @@ services:
   postgresdb:
     build:
       context: ../../build/postgresdb
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: crapi
     image: isoloom/crapi-postgresdb
     platform: linux/amd64
     hostname: postgresdb
@@ -39,6 +42,8 @@ services:
           memory: 256M
     labels:
       isoloom.service.postgres: tcp:5432
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
     restart: unless-stopped
   postgresdb-routes:
     image: alpine:3.20
@@ -60,9 +65,15 @@ services:
       postgresdb:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   mongodb:
     build:
       context: ../../build/mongodb
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: crapi
     image: isoloom/crapi-mongodb
     platform: linux/amd64
     hostname: mongodb
@@ -93,6 +104,8 @@ services:
           memory: 256M
     labels:
       isoloom.service.mongodb: tcp:27017
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
     restart: unless-stopped
   mongodb-routes:
     image: alpine:3.20
@@ -114,9 +127,15 @@ services:
       mongodb:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   mailhog:
     build:
       context: ../../build/mailhog
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: crapi
     image: isoloom/crapi-mailhog
     platform: linux/amd64
     hostname: mailhog
@@ -153,6 +172,8 @@ services:
     labels:
       isoloom.service.smtp: tcp:1025
       isoloom.service.mail-ui: http:8025
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
     restart: unless-stopped
   mailhog-routes:
     image: alpine:3.20
@@ -174,9 +195,15 @@ services:
       mailhog:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   gateway-service:
     build:
       context: ../../build/gateway-service
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: crapi
     image: isoloom/crapi-gateway-service
     platform: linux/amd64
     hostname: gateway-service
@@ -206,6 +233,8 @@ services:
           memory: 256M
     labels:
       isoloom.service.https: tcp:443
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
     restart: unless-stopped
   gateway-service-routes:
     image: alpine:3.20
@@ -227,9 +256,15 @@ services:
       gateway-service:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   crapi-identity:
     build:
       context: ../../build/crapi-identity
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: crapi
     image: isoloom/crapi-crapi-identity
     platform: linux/amd64
     hostname: crapi-identity
@@ -271,6 +306,8 @@ services:
           memory: 384M
     labels:
       isoloom.service.identity: http:8080
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
     restart: unless-stopped
   crapi-identity-routes:
     image: alpine:3.20
@@ -292,9 +329,15 @@ services:
       crapi-identity:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   crapi-community:
     build:
       context: ../../build/crapi-community
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: crapi
     image: isoloom/crapi-crapi-community
     platform: linux/amd64
     hostname: crapi-community
@@ -336,6 +379,8 @@ services:
           memory: 256M
     labels:
       isoloom.service.community: http:8087
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
     restart: unless-stopped
   crapi-community-routes:
     image: alpine:3.20
@@ -357,9 +402,15 @@ services:
       crapi-community:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   crapi-workshop:
     build:
       context: ../../build/crapi-workshop
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: crapi
     image: isoloom/crapi-crapi-workshop
     platform: linux/amd64
     hostname: crapi-workshop
@@ -405,6 +456,8 @@ services:
           memory: 256M
     labels:
       isoloom.service.workshop: http:8000
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
     restart: unless-stopped
   crapi-workshop-routes:
     image: alpine:3.20
@@ -426,9 +479,15 @@ services:
       crapi-workshop:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   crapi-web:
     build:
       context: ../../build/crapi-web
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: crapi
     image: isoloom/crapi-crapi-web
     platform: linux/amd64
     hostname: crapi-web
@@ -478,6 +537,8 @@ services:
     labels:
       isoloom.service.web: http:80
       isoloom.service.https: tcp:443
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
     restart: unless-stopped
   crapi-web-routes:
     image: alpine:3.20
@@ -499,6 +560,9 @@ services:
       crapi-web:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   isoloom-check:
     image: curlimages/curl:8.11.1
     profiles:
@@ -548,6 +612,9 @@ services:
         condition: service_healthy
       crapi-web-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   isoloom-check-postgresdb:
     image: curlimages/curl:8.11.1
     profiles:
@@ -591,6 +658,9 @@ services:
         condition: service_healthy
       crapi-web-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   isoloom-check-mongodb:
     image: curlimages/curl:8.11.1
     profiles:
@@ -634,6 +704,9 @@ services:
         condition: service_healthy
       crapi-web-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   isoloom-check-mailhog:
     image: curlimages/curl:8.11.1
     profiles:
@@ -677,6 +750,9 @@ services:
         condition: service_healthy
       crapi-web-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   isoloom-check-gateway-service:
     image: curlimages/curl:8.11.1
     profiles:
@@ -720,6 +796,9 @@ services:
         condition: service_healthy
       crapi-web-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   isoloom-check-crapi-identity:
     image: curlimages/curl:8.11.1
     profiles:
@@ -763,6 +842,9 @@ services:
         condition: service_healthy
       crapi-web-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   isoloom-check-crapi-community:
     image: curlimages/curl:8.11.1
     profiles:
@@ -806,6 +888,9 @@ services:
         condition: service_healthy
       crapi-web-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   isoloom-check-crapi-workshop:
     image: curlimages/curl:8.11.1
     profiles:
@@ -849,6 +934,9 @@ services:
         condition: service_healthy
       crapi-web-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   isoloom-check-crapi-web:
     image: curlimages/curl:8.11.1
     profiles:
@@ -892,6 +980,9 @@ services:
         condition: service_healthy
       crapi-web-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   isoloom-probe-amd64:
     image: busybox:1.37.0-musl
     platform: linux/amd64
@@ -903,13 +994,28 @@ services:
     - isoloom-probe-amd64:/probe
     network_mode: none
     restart: no
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
 networks:
   lab:
     ipam:
       config:
       - subnet: 10.60.6.0/24
         gateway: 10.60.6.1
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
 volumes:
-  postgresdb-data: {}
-  mongodb-data: {}
-  isoloom-probe-amd64: {}
+  postgresdb-data:
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
+  mongodb-data:
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
+  isoloom-probe-amd64:
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi

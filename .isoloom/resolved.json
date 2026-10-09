@@ -399,7 +399,8 @@
       "vagrant": "needs `vm:` on postgresdb, mongodb, mailhog, gateway-service, crapi-identity, crapi-community, crapi-workshop, crapi-web",
       "proxmox": "needs `vm:` on postgresdb, mongodb, mailhog, gateway-service, crapi-identity, crapi-community, crapi-workshop, crapi-web",
       "cloud-vm": "needs `vm:` on postgresdb, mongodb, mailhog, gateway-service, crapi-identity, crapi-community, crapi-workshop, crapi-web",
-      "external": "needs `external:` on postgresdb, mongodb, mailhog, gateway-service, crapi-identity, crapi-community, crapi-workshop, crapi-web"
+      "external": "needs `external:` on postgresdb, mongodb, mailhog, gateway-service, crapi-identity, crapi-community, crapi-workshop, crapi-web",
+      "cloud-services": "left out by `targets:`"
     }
   },
   "checks": {
