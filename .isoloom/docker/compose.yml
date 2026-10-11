@@ -417,6 +417,14 @@ services:
     networks:
       lab:
         ipv4_address: 10.60.6.13
+    environment:
+      CTF_FLAG_MAIN: ${CTF_FLAG_MAIN:-}
+      CTF_FLAG_VEHICLE_LOCATION: ${CTF_FLAG_VEHICLE_LOCATION:-}
+      CTF_FLAG_MECHANIC_REPORT: ${CTF_FLAG_MECHANIC_REPORT:-}
+      CTF_FLAG_PASSWORD_RESET: ${CTF_FLAG_PASSWORD_RESET:-}
+      CTF_FLAG_NOSQL_COUPON: ${CTF_FLAG_NOSQL_COUPON:-}
+      CTF_FLAG_SQL_COUPON: ${CTF_FLAG_SQL_COUPON:-}
+      CTF_FLAG_UNAUTH_ORDER: ${CTF_FLAG_UNAUTH_ORDER:-}
     healthcheck:
       test:
       - CMD
@@ -482,6 +490,31 @@ services:
     labels:
       isoloom.managed: 'true'
       isoloom.environment: crapi
+  crapi-workshop-init-1:
+    image: isoloom/crapi-crapi-workshop
+    entrypoint:
+    - /bin/sh
+    - /isoloom/init/flag.sh
+    volumes:
+    - ../../ctf/flag.sh:/isoloom/init/flag.sh:ro
+    network_mode: service:crapi-workshop
+    environment:
+      CTF_FLAG_MAIN: ${CTF_FLAG_MAIN:-}
+      CTF_FLAG_VEHICLE_LOCATION: ${CTF_FLAG_VEHICLE_LOCATION:-}
+      CTF_FLAG_MECHANIC_REPORT: ${CTF_FLAG_MECHANIC_REPORT:-}
+      CTF_FLAG_PASSWORD_RESET: ${CTF_FLAG_PASSWORD_RESET:-}
+      CTF_FLAG_NOSQL_COUPON: ${CTF_FLAG_NOSQL_COUPON:-}
+      CTF_FLAG_SQL_COUPON: ${CTF_FLAG_SQL_COUPON:-}
+      CTF_FLAG_UNAUTH_ORDER: ${CTF_FLAG_UNAUTH_ORDER:-}
+    depends_on:
+      crapi-workshop:
+        condition: service_healthy
+      crapi-workshop-routes:
+        condition: service_healthy
+    restart: no
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: crapi
   crapi-web:
     build:
       context: ../../build/crapi-web
@@ -523,6 +556,8 @@ services:
         condition: service_healthy
       crapi-workshop:
         condition: service_healthy
+      crapi-workshop-init-1:
+        condition: service_completed_successfully
       crapi-workshop-routes:
         condition: service_healthy
       mailhog:
@@ -606,6 +641,8 @@ services:
         condition: service_healthy
       crapi-workshop:
         condition: service_healthy
+      crapi-workshop-init-1:
+        condition: service_completed_successfully
       crapi-workshop-routes:
         condition: service_healthy
       crapi-web:
@@ -652,6 +689,8 @@ services:
         condition: service_healthy
       crapi-workshop:
         condition: service_healthy
+      crapi-workshop-init-1:
+        condition: service_completed_successfully
       crapi-workshop-routes:
         condition: service_healthy
       crapi-web:
@@ -698,6 +737,8 @@ services:
         condition: service_healthy
       crapi-workshop:
         condition: service_healthy
+      crapi-workshop-init-1:
+        condition: service_completed_successfully
       crapi-workshop-routes:
         condition: service_healthy
       crapi-web:
@@ -744,6 +785,8 @@ services:
         condition: service_healthy
       crapi-workshop:
         condition: service_healthy
+      crapi-workshop-init-1:
+        condition: service_completed_successfully
       crapi-workshop-routes:
         condition: service_healthy
       crapi-web:
@@ -790,6 +833,8 @@ services:
         condition: service_healthy
       crapi-workshop:
         condition: service_healthy
+      crapi-workshop-init-1:
+        condition: service_completed_successfully
       crapi-workshop-routes:
         condition: service_healthy
       crapi-web:
@@ -836,6 +881,8 @@ services:
         condition: service_healthy
       crapi-workshop:
         condition: service_healthy
+      crapi-workshop-init-1:
+        condition: service_completed_successfully
       crapi-workshop-routes:
         condition: service_healthy
       crapi-web:
@@ -882,6 +929,8 @@ services:
         condition: service_healthy
       crapi-workshop:
         condition: service_healthy
+      crapi-workshop-init-1:
+        condition: service_completed_successfully
       crapi-workshop-routes:
         condition: service_healthy
       crapi-web:
@@ -928,6 +977,8 @@ services:
         condition: service_healthy
       crapi-workshop:
         condition: service_healthy
+      crapi-workshop-init-1:
+        condition: service_completed_successfully
       crapi-workshop-routes:
         condition: service_healthy
       crapi-web:
@@ -974,6 +1025,8 @@ services:
         condition: service_healthy
       crapi-workshop:
         condition: service_healthy
+      crapi-workshop-init-1:
+        condition: service_completed_successfully
       crapi-workshop-routes:
         condition: service_healthy
       crapi-web:

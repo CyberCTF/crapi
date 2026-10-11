@@ -3,7 +3,15 @@
   "resolved_version": 1,
   "name": "crapi",
   "instance": null,
-  "inputs": [],
+  "inputs": [
+    "CTF_FLAG_MAIN",
+    "CTF_FLAG_VEHICLE_LOCATION",
+    "CTF_FLAG_MECHANIC_REPORT",
+    "CTF_FLAG_PASSWORD_RESET",
+    "CTF_FLAG_NOSQL_COUPON",
+    "CTF_FLAG_SQL_COUPON",
+    "CTF_FLAG_UNAUTH_ORDER"
+  ],
   "networks": {
     "lab": {
       "cidr": "10.60.6.0/24",
@@ -282,7 +290,15 @@
         "crapi-identity",
         "crapi-community"
       ],
-      "inputs": [],
+      "inputs": [
+        "CTF_FLAG_MAIN",
+        "CTF_FLAG_VEHICLE_LOCATION",
+        "CTF_FLAG_MECHANIC_REPORT",
+        "CTF_FLAG_PASSWORD_RESET",
+        "CTF_FLAG_NOSQL_COUPON",
+        "CTF_FLAG_SQL_COUPON",
+        "CTF_FLAG_UNAUTH_ORDER"
+      ],
       "volumes": {},
       "resources": {
         "cpus": 1,
@@ -1151,5 +1167,5 @@
       }
     ]
   },
-  "message": "crAPI answers at http://localhost:8888/ (HTTPS on\n8443). Sign up with an @example.com address; the mails\n(OTPs, vehicle details) arrive in MailHog at http://localhost:8025/.\nThe challenges are listed in app/docs/challenges.md.\n"
+  "message": "crAPI answers at http://localhost:8888/ (HTTPS on\n8443). Sign up with an @example.com address; the mails\n(OTPs, vehicle details) arrive in MailHog at http://localhost:8025/.\nThe challenges are listed in app/docs/challenges.md (the chatbot ones are left out).\n"
 }

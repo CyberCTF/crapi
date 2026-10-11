@@ -1,0 +1,240 @@
+{
+  "objectives": [
+    {
+      "key": "main",
+      "title": "Forge a valid JWT",
+      "prompt": "crAPI's token handling has several JWT weaknesses. Get a token the platform accepts for the admin account and read the name of the profile video on admin's dashboard: that name is the flag.",
+      "check": {
+        "evidence": "SECRET",
+        "format": "FLAG{%s}"
+      },
+      "dev": "FLAG{dev-crapi-main}",
+      "hints": [
+        "Look at how the identity service publishes its keys and which JWT header fields it trusts.",
+        "Not every endpoint verifies the token's signature the same way: compare the dashboard with the others."
+      ],
+      "steps": [
+        {
+          "key": "algorithm",
+          "title": "Read the token",
+          "prompt": "Which signing algorithm do the tokens crAPI issues use? (JWT alg name)",
+          "check": {
+            "answer": [
+              "rs256"
+            ]
+          }
+        },
+        {
+          "key": "keys",
+          "title": "Find the public key",
+          "prompt": "Under which well-known file name does crAPI publish its signing keys? (file name only)",
+          "check": {
+            "answer": [
+              "jwks.json",
+              "jwks"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "key": "vehicle-location",
+      "title": "Access details of another user's vehicle",
+      "prompt": "Leak the location of a vehicle that belongs to another user (one of the community post authors). The latitude it reports is the flag.",
+      "check": {
+        "evidence": "SECRET",
+        "format": "FLAG{%s}"
+      },
+      "dev": "FLAG{dev-crapi-vehicle-location}",
+      "hints": [
+        "Vehicle IDs are GUIDs, so find an API response that hands out other users' vehicle IDs.",
+        "Then look for an endpoint that takes a vehicle ID and returns where the vehicle is."
+      ]
+    },
+    {
+      "key": "mechanic-report",
+      "title": "Access mechanic reports of other users",
+      "prompt": "Read a mechanic report submitted by another user. The service reference at the end of its problem details is the flag.",
+      "check": {
+        "evidence": "SECRET",
+        "format": "FLAG{%s}"
+      },
+      "dev": "FLAG{dev-crapi-mechanic-report}",
+      "hints": [
+        "Submit a 'contact mechanic' request yourself and read the whole response.",
+        "The report endpoint takes an identifier: what happens with one that isn't yours?"
+      ]
+    },
+    {
+      "key": "password-reset",
+      "title": "Reset the password of a different user",
+      "prompt": "Take over the account of robot001@example.com through the password reset flow and read the name of the profile video on its dashboard: that name is the flag.",
+      "check": {
+        "evidence": "SECRET",
+        "format": "FLAG{%s}"
+      },
+      "dev": "FLAG{dev-crapi-password-reset}",
+      "hints": [
+        "The reset flow ends with a short one-time code. How many tries does each version of the check endpoint allow?",
+        "REST APIs are predictable: older versions of an endpoint may still be served."
+      ]
+    },
+    {
+      "key": "user-data-leak",
+      "title": "Find an endpoint that leaks other users' data",
+      "prompt": "Find the API response that exposes sensitive data of other users. What is the vehicle ID of the author of the community post 'Title 3'?",
+      "check": {
+        "answer": [
+          "4bae9968-ec7f-4de3-a3a0-ba1b2ab5e5e5"
+        ]
+      },
+      "hints": [
+        "Watch the API calls the Community page makes and read every field of each post's author."
+      ]
+    },
+    {
+      "key": "video-property",
+      "title": "Find an internal property of a video",
+      "prompt": "Upload a profile video and find the internal property of the video resource the API should not expose. What is that property called?",
+      "check": {
+        "answer": [
+          "conversion_params",
+          "conversion params",
+          "conversion_param"
+        ]
+      },
+      "hints": [
+        "Read the full response of the video endpoints, not only what the page shows."
+      ]
+    },
+    {
+      "key": "contact-mechanic-dos",
+      "title": "Layer 7 DoS through 'contact mechanic'",
+      "optional": true,
+      "prompt": "The 'contact mechanic' request can make the workshop service call another API over and over. Which request field sets how many times it repeats the call?",
+      "check": {
+        "answer": [
+          "number_of_repeats",
+          "number of repeats"
+        ]
+      },
+      "hints": [
+        "Read the JSON body the page sends when you contact a mechanic."
+      ]
+    },
+    {
+      "key": "delete-video",
+      "title": "Delete a video of another user",
+      "optional": true,
+      "prompt": "Find the function-level authorization flaw that lets a regular user delete someone else's video. Which privilege level does the path of the endpoint you used belong to? (one word)",
+      "check": {
+        "answer": [
+          "admin",
+          "administrator"
+        ]
+      },
+      "hints": [
+        "REST paths are predictable: the user video endpoint has a sibling for a more privileged role."
+      ]
+    },
+    {
+      "key": "free-item",
+      "title": "Get an item for free",
+      "prompt": "Get refunded for an order you never returned, using a shadow endpoint that edits an order's properties. Which order property did you change to get the refund?",
+      "check": {
+        "answer": [
+          "status",
+          "order status"
+        ]
+      },
+      "hints": [
+        "Mass assignment: the API accepts more properties than the page ever sends.",
+        "Look for an HTTP method on a single order that the page does not use."
+      ]
+    },
+    {
+      "key": "balance-boost",
+      "title": "Increase your balance by $1,000 or more",
+      "optional": true,
+      "prompt": "After the free item, get a refund large enough to raise your balance by $1,000 or more. Which order property scales the amount refunded?",
+      "check": {
+        "answer": [
+          "quantity"
+        ]
+      },
+      "hints": [
+        "The refund is computed from the order: which of its numbers can you control?"
+      ]
+    },
+    {
+      "key": "video-update",
+      "title": "Update internal video properties",
+      "optional": true,
+      "prompt": "Change the internal property of your profile video found earlier. Which HTTP method does the video endpoint accept for the change?",
+      "check": {
+        "answer": [
+          "put"
+        ]
+      },
+      "hints": [
+        "The page renames videos: see which request it sends and what else that request accepts."
+      ]
+    },
+    {
+      "key": "ssrf",
+      "title": "Make crAPI send a request for you",
+      "prompt": "Make the workshop service send an HTTP request to a URL you choose and return the response (the lab has no internet, so aim at a host inside it). Which request field carries the URL the server calls?",
+      "check": {
+        "answer": [
+          "mechanic_api",
+          "mechanic api"
+        ]
+      },
+      "hints": [
+        "One feature makes the server call another API on your behalf: read the body it sends."
+      ]
+    },
+    {
+      "key": "nosql-coupon",
+      "title": "Get a free coupon without its code",
+      "prompt": "Make the coupon validation endpoint return a coupon without knowing any coupon code. The code of the coupon it returns is the flag.",
+      "check": {
+        "evidence": "SECRET",
+        "format": "FLAG{%s}"
+      },
+      "dev": "FLAG{dev-crapi-nosql-coupon}",
+      "hints": [
+        "The community service keeps coupons in MongoDB and passes your JSON to its query.",
+        "Look up NoSQL injection with query operators."
+      ]
+    },
+    {
+      "key": "sql-coupon",
+      "title": "Redeem a coupon twice through the database",
+      "prompt": "The coupon redemption check builds its SQL query from your input. Use SQL injection against it to read the table flags of the crapi database.",
+      "check": {
+        "evidence": "SECRET",
+        "format": "FLAG{%s}"
+      },
+      "dev": "FLAG{dev-crapi-sql-coupon}",
+      "hints": [
+        "The workshop service checks applied coupons in PostgreSQL with a query built from the coupon code.",
+        "Find out how many columns the query returns and what the database is."
+      ]
+    },
+    {
+      "key": "unauth-order",
+      "title": "Find an endpoint without authentication",
+      "prompt": "Find the endpoint that answers without any authentication and read an order placed by another user. Its transaction ID is the flag.",
+      "check": {
+        "evidence": "SECRET",
+        "format": "FLAG{%s}"
+      },
+      "dev": "FLAG{dev-crapi-unauth-order}",
+      "hints": [
+        "Replay the shop's API calls without the Authorization header.",
+        "Order IDs are small integers."
+      ]
+    }
+  ]
+}

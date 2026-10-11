@@ -7,6 +7,17 @@
 version: 1
 name: crapi
 
+# Given by the CyberCTF launcher: this player's flags, one per challenge that has a secret to
+# capture. Without them the development flags.
+inputs:
+  - CTF_FLAG_MAIN
+  - CTF_FLAG_VEHICLE_LOCATION
+  - CTF_FLAG_MECHANIC_REPORT
+  - CTF_FLAG_PASSWORD_RESET
+  - CTF_FLAG_NOSQL_COUPON
+  - CTF_FLAG_SQL_COUPON
+  - CTF_FLAG_UNAUTH_ORDER
+
 networks:
   lab: { cidr: 10.60.6.0/24, internet: false }
 
@@ -65,8 +76,17 @@ machines:
     services: [{ port: 8000, name: workshop, http: true }]
     resources: { cpus: 1, memory_mb: 256 }
     depends_on: [postgresdb, mongodb, crapi-identity, crapi-community]
+    inputs:
+      - CTF_FLAG_MAIN
+      - CTF_FLAG_VEHICLE_LOCATION
+      - CTF_FLAG_MECHANIC_REPORT
+      - CTF_FLAG_PASSWORD_RESET
+      - CTF_FLAG_NOSQL_COUPON
+      - CTF_FLAG_SQL_COUPON
+      - CTF_FLAG_UNAUTH_ORDER
     docker:
       build: build/crapi-workshop
+      init: [ctf/flag.sh]   # the flags, written into PostgreSQL and MongoDB at every start
 
   crapi-web:
     networks: { lab: 10 }
@@ -103,4 +123,4 @@ message: |
   crAPI answers at http://localhost:{{ machines.crapi-web.services.0.publish }}/ (HTTPS on
   {{ machines.crapi-web.services.1.publish }}). Sign up with an @example.com address; the mails
   (OTPs, vehicle details) arrive in MailHog at http://localhost:{{ machines.mailhog.services.1.publish }}/.
-  The challenges are listed in app/docs/challenges.md.
+  The challenges are listed in app/docs/challenges.md (the chatbot ones are left out).

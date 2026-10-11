@@ -13,6 +13,7 @@
 #   docker build -t isoloom/crapi-crapi-community build/crapi-community
 #   docker build -t isoloom/crapi-crapi-workshop build/crapi-workshop
 #   docker build -t isoloom/crapi-crapi-web build/crapi-web
+# Inputs (optional, unset ones are empty): kubectl -n isoloom-crapi create secret generic isoloom-inputs --from-literal=CTF_FLAG_MAIN=… --from-literal=CTF_FLAG_VEHICLE_LOCATION=… --from-literal=CTF_FLAG_MECHANIC_REPORT=… --from-literal=CTF_FLAG_PASSWORD_RESET=… --from-literal=CTF_FLAG_NOSQL_COUPON=… --from-literal=CTF_FLAG_SQL_COUPON=… --from-literal=CTF_FLAG_UNAUTH_ORDER=…
 
 apiVersion: v1
 kind: Namespace
@@ -744,6 +745,49 @@ spec:
             - /.isoloom-probe/busybox nc -z -w 2 127.0.0.1 8000
           periodSeconds: 5
           failureThreshold: 60
+        env:
+        - name: CTF_FLAG_MAIN
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_MAIN
+              optional: true
+        - name: CTF_FLAG_VEHICLE_LOCATION
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_VEHICLE_LOCATION
+              optional: true
+        - name: CTF_FLAG_MECHANIC_REPORT
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_MECHANIC_REPORT
+              optional: true
+        - name: CTF_FLAG_PASSWORD_RESET
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_PASSWORD_RESET
+              optional: true
+        - name: CTF_FLAG_NOSQL_COUPON
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_NOSQL_COUPON
+              optional: true
+        - name: CTF_FLAG_SQL_COUPON
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_SQL_COUPON
+              optional: true
+        - name: CTF_FLAG_UNAUTH_ORDER
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_UNAUTH_ORDER
+              optional: true
         resources:
           limits:
             cpu: '1'
@@ -752,9 +796,69 @@ spec:
         - name: isoloom-probe
           mountPath: /.isoloom-probe
           readOnly: true
+      - name: init
+        image: isoloom/crapi-crapi-workshop
+        imagePullPolicy: IfNotPresent
+        command:
+        - sh
+        - -c
+        - until /.isoloom-probe/busybox nc -z -w 2 127.0.0.1 8000; do sleep 2; done && sh /isoloom/scripts/ctf__flag.sh && exec sleep infinity
+        env:
+        - name: CTF_FLAG_MAIN
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_MAIN
+              optional: true
+        - name: CTF_FLAG_VEHICLE_LOCATION
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_VEHICLE_LOCATION
+              optional: true
+        - name: CTF_FLAG_MECHANIC_REPORT
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_MECHANIC_REPORT
+              optional: true
+        - name: CTF_FLAG_PASSWORD_RESET
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_PASSWORD_RESET
+              optional: true
+        - name: CTF_FLAG_NOSQL_COUPON
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_NOSQL_COUPON
+              optional: true
+        - name: CTF_FLAG_SQL_COUPON
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_SQL_COUPON
+              optional: true
+        - name: CTF_FLAG_UNAUTH_ORDER
+          valueFrom:
+            secretKeyRef:
+              name: isoloom-inputs
+              key: CTF_FLAG_UNAUTH_ORDER
+              optional: true
+        volumeMounts:
+        - name: isoloom-probe
+          mountPath: /.isoloom-probe
+          readOnly: true
+        - name: scripts
+          mountPath: /isoloom/scripts
       nodeSelector:
         kubernetes.io/arch: amd64
       volumes:
+      - name: scripts
+        configMap:
+          name: isoloom-scripts
+          defaultMode: 493
       - name: isoloom-probe
         emptyDir: {}
 ---
