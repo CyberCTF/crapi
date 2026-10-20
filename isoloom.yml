@@ -10,94 +10,117 @@ name: crapi
 # Given by the CyberCTF launcher: this player's flags, one per challenge that has a secret to
 # capture. Without them the development flags.
 inputs:
-  - CTF_FLAG_MAIN
-  - CTF_FLAG_VEHICLE_LOCATION
-  - CTF_FLAG_MECHANIC_REPORT
-  - CTF_FLAG_PASSWORD_RESET
-  - CTF_FLAG_NOSQL_COUPON
-  - CTF_FLAG_SQL_COUPON
-  - CTF_FLAG_UNAUTH_ORDER
-
+  CTF_FLAG_MAIN: {}
+  CTF_FLAG_VEHICLE_LOCATION: {}
+  CTF_FLAG_MECHANIC_REPORT: {}
+  CTF_FLAG_PASSWORD_RESET: {}
+  CTF_FLAG_NOSQL_COUPON: {}
+  CTF_FLAG_SQL_COUPON: {}
+  CTF_FLAG_UNAUTH_ORDER: {}
 networks:
-  lab: { cidr: 10.60.6.0/24, internet: false }
+  lab: {cidr: 10.60.6.0/24, internet: false}
 
 machines:
   postgresdb:
-    networks: { lab: 20 }
-    services: [{ port: 5432, name: postgres }]
-    resources: { cpus: 1, memory_mb: 256 }
-    volumes: { data: /var/lib/postgresql/data }
-    docker:
+    networks: {lab: 20}
+    resources: {cpus: 1, memory_mb: 256}
+    volumes: {data: /var/lib/postgresql/data}
+    ports:
+      postgres:
+        port: 5432
+    app:
       build: build/postgresdb
-
   mongodb:
-    networks: { lab: 21 }
-    services: [{ port: 27017, name: mongodb }]
-    resources: { cpus: 1, memory_mb: 256 }
-    volumes: { data: /data/db }
-    docker:
+    networks: {lab: 21}
+    resources: {cpus: 1, memory_mb: 256}
+    volumes: {data: /data/db}
+    ports:
+      mongodb:
+        port: 27017
+    app:
       build: build/mongodb
-
   mailhog:
-    networks: { lab: 22 }
-    services:
-      - { port: 1025, name: smtp }
-      - { port: 8025, name: mail-ui, http: true, publish: 8025 }
-    resources: { cpus: 1, memory_mb: 256 }
+    networks: {lab: 22}
+    resources: {cpus: 1, memory_mb: 256}
     depends_on: [mongodb]
-    docker:
+    ports:
+      smtp:
+        port: 1025
+      mail-ui:
+        port: 8025
+        protocol: http
+        publish: true
+    app:
       build: build/mailhog
-
   gateway-service:
-    networks: { lab: 23 }
-    services: [{ port: 443, name: https }]
-    resources: { cpus: 1, memory_mb: 256 }
-    docker:
+    networks: {lab: 23}
+    resources: {cpus: 1, memory_mb: 256}
+    ports:
+      https:
+        port: 443
+    app:
       build: build/gateway-service
-
   crapi-identity:
-    networks: { lab: 11 }
-    services: [{ port: 8080, name: identity, http: true }]
-    resources: { cpus: 1, memory_mb: 384 }
+    networks: {lab: 11}
+    resources: {cpus: 1, memory_mb: 384}
     depends_on: [postgresdb, mongodb, mailhog]
-    docker:
+    ports:
+      identity:
+        port: 8080
+        protocol: http
+    app:
       build: build/crapi-identity
-
   crapi-community:
-    networks: { lab: 12 }
-    services: [{ port: 8087, name: community, http: true }]
-    resources: { cpus: 1, memory_mb: 256 }
+    networks: {lab: 12}
+    resources: {cpus: 1, memory_mb: 256}
     depends_on: [postgresdb, mongodb, crapi-identity]
-    docker:
+    ports:
+      community:
+        port: 8087
+        protocol: http
+    app:
       build: build/crapi-community
-
   crapi-workshop:
-    networks: { lab: 13 }
-    services: [{ port: 8000, name: workshop, http: true }]
-    resources: { cpus: 1, memory_mb: 256 }
+    networks: {lab: 13}
+    resources: {cpus: 1, memory_mb: 256}
     depends_on: [postgresdb, mongodb, crapi-identity, crapi-community]
-    inputs:
-      - CTF_FLAG_MAIN
-      - CTF_FLAG_VEHICLE_LOCATION
-      - CTF_FLAG_MECHANIC_REPORT
-      - CTF_FLAG_PASSWORD_RESET
-      - CTF_FLAG_NOSQL_COUPON
-      - CTF_FLAG_SQL_COUPON
-      - CTF_FLAG_UNAUTH_ORDER
-    docker:
+    ports:
+      workshop:
+        port: 8000
+        protocol: http
+    files:
+      - path: /run/lab/ctf_flag_main
+        input: CTF_FLAG_MAIN
+      - path: /run/lab/ctf_flag_vehicle_location
+        input: CTF_FLAG_VEHICLE_LOCATION
+      - path: /run/lab/ctf_flag_mechanic_report
+        input: CTF_FLAG_MECHANIC_REPORT
+      - path: /run/lab/ctf_flag_password_reset
+        input: CTF_FLAG_PASSWORD_RESET
+      - path: /run/lab/ctf_flag_nosql_coupon
+        input: CTF_FLAG_NOSQL_COUPON
+      - path: /run/lab/ctf_flag_sql_coupon
+        input: CTF_FLAG_SQL_COUPON
+      - path: /run/lab/ctf_flag_unauth_order
+        input: CTF_FLAG_UNAUTH_ORDER
+    setup:
+      - ctf/flag.sh
+    app:
       build: build/crapi-workshop
-      init: [ctf/flag.sh]   # the flags, written into PostgreSQL and MongoDB at every start
-
   crapi-web:
-    networks: { lab: 10 }
-    services:
-      - { port: 80, name: web, http: true, publish: 8888 }
-      - { port: 443, name: https, publish: 8443 }
-    resources: { cpus: 1, memory_mb: 256 }
+    networks: {lab: 10}
+    resources: {cpus: 1, memory_mb: 256}
     depends_on: [crapi-identity, crapi-community, crapi-workshop, mailhog]
-    docker:
+    ports:
+      web:
+        port: 80
+        protocol: http
+        publish: true
+      https:
+        port: 443
+        publish: true
+    app:
       build: build/crapi-web
-
 checks:
   - name: crAPI answers
     http: http://crapi-web/
@@ -120,7 +143,7 @@ checks:
     tcp: gateway-service:443
 
 message: |
-  crAPI answers at http://localhost:{{ machines.crapi-web.services.0.publish }}/ (HTTPS on
-  {{ machines.crapi-web.services.1.publish }}). Sign up with an @example.com address; the mails
-  (OTPs, vehicle details) arrive in MailHog at http://localhost:{{ machines.mailhog.services.1.publish }}/.
+  crAPI answers at {{ machines.crapi-web.ports.web.url }} (HTTPS on
+  {{ machines.crapi-web.ports.https.published }}). Sign up with an @example.com address; the mails
+  (OTPs, vehicle details) arrive in MailHog at {{ machines.mailhog.ports.mail-ui.url }}.
   The challenges are listed in app/docs/challenges.md (the chatbot ones are left out).
